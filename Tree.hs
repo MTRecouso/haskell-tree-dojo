@@ -3,16 +3,19 @@ import Text.Read (readMaybe)
 
 data Tree a = Node a (Tree a) (Tree a) | Leaf a | Null deriving Show
 
-data Action = Inserir | Deletar | Sair
+data Action = Inserir | Deletar | Percorrer | Sair
 
 main :: IO ()
 main = do
     let while tree = do
-        putStrLn "Digite 1 para inserir, 2 para deletar e 3 para sair"
+        putStrLn "Digite 1 para inserir, 2 para deletar e 3 para percorrer e 4 para sair"
         actionInput <- getLine
         case toAction actionInput of
             (Just Sair) -> do
                 putStrLn "Fim"
+            (Just Percorrer) -> do
+                putStrLn $ showTreeInOrder tree
+                while tree
             (Just action) -> do
                 putStrLn "Digite um numero"
                 userInput <- getLine
@@ -32,13 +35,18 @@ main = do
 toAction :: String -> Maybe Action
 toAction "1" = Just Inserir
 toAction "2" = Just Deletar
-toAction "3" = Just Sair
+toAction "3" = Just Percorrer
+toAction "4" = Just Sair
 toAction _ = Nothing
+
+showTreeInOrder :: Tree Int -> String
+showTreeInOrder (Node value left right) = showTreeInOrder left ++ show value ++ ", " ++ showTreeInOrder right
+showTreeInOrder (Leaf value) = show value ++ ", "
+showTreeInOrder Null = ""
 
 doAction :: Action -> Int -> Tree Int -> Tree Int
 doAction Inserir = insertIntoTree
 doAction Deletar = deleteFromTree
-
 
 insertIntoTree :: Int -> Tree Int -> Tree Int
 insertIntoTree number (Node value left right)
